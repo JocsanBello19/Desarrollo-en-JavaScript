@@ -1,0 +1,333 @@
+<!--HTML-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Caja Registradora</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Caja Registradora</h1>
+      <div id="change-due"></div>
+      <div class="input-div">
+        <label for="cash">Ingrese el dinero del cliente:</label>
+        <input type="number" id="cash" class="user-input" value="cash" required placeholder="$$$"/>
+        <button class="check-btn-styles" id="purchase-btn">Comprar</button>
+      </div>
+      <div class="container">
+        <div class="top-display-screen-container">
+          <p id="price-screen" class="price-screen"></p>
+          <div class="connector"></div>
+        </div>
+        <div class="top-register">
+          <div class="btns-container">
+            <button class="btn"></button>
+            <button class="btn"></button>
+            <button class="btn"></button>
+            <button class="btn"></button>
+            <button class="btn"></button>
+            <button class="btn"></button>
+            <button class="btn"></button>
+            <button class="btn"></button>
+            <button class="btn"></button>
+          </div>
+          <div id="cash-drawer-display" class="cash-drawer-display"></div>
+        </div>
+        <div class="bottom-register">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </main>
+    <script src="./script.js"></script>
+  </body>
+</html>
+
+<!--JS -->
+let price = 3.26;
+let cid = [
+  ['PENNY', 1.01],
+  ['NICKEL', 2.05],
+  ['DIME', 3.1],
+  ['QUARTER', 4.25],
+  ['ONE', 90],
+  ['FIVE', 55],
+  ['TEN', 20],
+  ['TWENTY', 60],
+  ['ONE HUNDRED', 100]
+];
+
+const mostrarCambioDeuda = document.getElementById('change-due');
+const efectivo = document.getElementById('cash');
+const comprarBtn = document.getElementById('purchase-btn');
+const pantallaPrecio = document.getElementById('price-screen');
+const interfazEfectivo = document.getElementById('cash-drawer-display');
+
+const modificarResultados = (estado, cambio) => {
+  mostrarCambioDeuda.innerHTML = `<p>Status: ${estado}</p>`;
+  cambio.map(
+    dinero => (mostrarCambioDeuda.innerHTML += `<p>${dinero[0]}: $${dinero[1]}</p>`)
+  );
+  return;
+};
+
+const varificarRegistroEfectivo = () => {
+  if (Number(efectivo.value) < price) {
+    alert('Customer does not have enough money to purchase the item');
+    efectivo.value = '';
+    return;
+  }
+
+  if (Number(efectivo.value) === price) {
+    mostrarCambioDeuda.innerHTML =
+      '<p>No change due - customer paid with exact cash</p>';
+    efectivo.value = '';
+    return;
+  }
+
+  let cambioDeuda = Number(efectivo.value) - price;
+  let reversedCid = [...cid].reverse();
+  let denominaciones = [100, 20, 10, 5, 1, 0.25, 0.1, 0.05, 0.01];
+  let resultado = { estado: 'OPEN', cambio: [] };
+  let totalCID = parseFloat(
+    cid
+      .map(total => total[1])
+      .reduce((prev, curr) => prev + curr)
+      .toFixed(2)
+  );
+
+  if (totalCID < cambioDeuda) {
+    return (mostrarCambioDeuda.innerHTML = '<p>Status: INSUFFICIENT_FUNDS</p>');
+  }
+
+  if (totalCID === cambioDeuda) {
+    resultado.estado = 'CLOSED';
+  }
+
+  for (let i = 0; i <= reversedCid.length; i++) {
+    if (cambioDeuda >= denominaciones[i] && cambioDeuda > 0) {
+      let cuenta = 0;
+      let total = reversedCid[i][1];
+      while (total > 0 && cambioDeuda >= denominaciones[i]) {
+        total -= denominaciones[i];
+        cambioDeuda = parseFloat((cambioDeuda -= denominaciones[i]).toFixed(2));
+        cuenta++;
+      }
+      if (cuenta > 0) {
+        resultado.cambio.push([reversedCid[i][0], cuenta * denominaciones[i]]);
+      }
+    }
+  }
+  if (cambioDeuda > 0) {
+    return (mostrarCambioDeuda.innerHTML = '<p>Status: INSUFFICIENT_FUNDS</p>');
+  }
+
+  modificarResultados(resultado.estado, resultado.cambio);
+  actualizar(resultado.cambio);
+};
+
+const verificarResultados = () => {
+  if (!efectivo.value) {
+    return;
+  }
+  varificarRegistroEfectivo();
+};
+
+const actualizar = cambio => {
+  const monedaNombre = {
+    PENNY: 'Pennies',
+    NICKEL: 'Nickels',
+    DIME: 'Dimes',
+    QUARTER: 'Quarters',
+    ONE: 'Ones',
+    FIVE: 'Fives',
+    TEN: 'Tens',
+    TWENTY: 'Twenties',
+    'ONE HUNDRED': 'Hundreds'
+  };
+  // Update cid if change is passed in
+  if (cambio) {
+    cambio.forEach(cambioArr => {
+      const objetivoArr = cid.find(cidArr => cidArr[0] === cambioArr[0]);
+      objetivoArr[1] = parseFloat((objetivoArr[1] - cambioArr[1]).toFixed(2));
+    });
+  }
+
+ efectivo.value = '';
+  pantallaPrecio.textContent = `Total: $${price}`;
+  interfazEfectivo.innerHTML = `<p><strong>Change in drawer:</strong></p>
+    ${cid
+      .map(dinero => `<p>${monedaNombre[dinero[0]]}: $${dinero[1]}</p>`)
+      .join('')}  
+  `;
+};
+
+comprarBtn.addEventListener('click', verificarResultados);
+
+efectivo.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    verificarResultados();
+  }
+});
+
+actualizar();
+
+<!-- CSS -->
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-01: #C6E2B5;
+  --color-02: #0a0a23;
+  --color-03: #FFC499;
+  --color-04: #FF8F00;
+}
+
+body {
+  background-image: url('https://th.bing.com/th/id/OIP.qGEITKD5DhXthQZ9RwF5SgHaGS?rs=1&pid=ImgDetMain');
+  background-size: cover;
+  background-position: center;
+  color: var(--color-01);
+  font-weight: bold;
+}
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10vh 10vw;
+}
+
+h1 {
+  font-size: 2.7rem;
+  margin: 5vh 0;
+  text-align: center;
+  text-decoration: underline; 
+}
+
+#change-due {
+  text-align: left;
+  font-size: 1.3rem;
+  border: 2px solid red;
+  padding: 1vh 1vw;
+  font-style: italic;
+  background-color: black; 
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 2vh 0 4vw;
+}
+
+label {
+  font-size: 1.3rem;
+}
+
+.user-input {
+  height: 6.5vh;
+  width: 90%;
+  padding: 0.8rem;
+  margin: 0.8rem;
+  font-size: 1rem;
+}
+
+.price-screen {
+  border: 0.6rem solid var(--color-03);
+  background-color: #2E865F;
+  height: 5rem;
+  width: 20rem;
+  color: black;
+  font-size: 1.4rem;
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.connector {
+  background-color: var(--color-03);
+  height: 2.5rem;
+  width: 2rem;
+  margin: 0 8.5rem;
+}
+
+.top-register {
+  display: flex;
+  justify-content: space-around;
+  border-radius: 25px;
+  padding-top: 4vh;
+  background-color: var(--color-03);
+  height: 17rem;
+  width: 20rem;
+}
+
+.btns-container {
+  width: 25%;
+}
+
+.btn {
+  border-radius: 40%;
+  border: 1px solid blue;
+  width: 20px;
+  height: 20px;
+  background-color: gray;
+}
+
+.check-btn-styles {
+  cursor: pointer;
+  width: 10rem;
+  height: 2rem;
+  margin: 0.6rem;
+  color: white;
+  text-decoration: underline;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background-color: #2F4F7F;
+  background-image: linear-gradient(#1A237E, #2F4F7F);
+  border-color: #2F4F7F;
+  border-width: 4px;
+}
+
+.cash-drawer-display {
+  font-size: 1.2rem;
+  background-color: #FFD700;
+  width: 55%;
+  height: 95%;
+  color: black;
+  padding: 0.4rem;
+}
+
+.bottom-register {
+  background-color: var(--color-04);
+  height: 3rem;
+  width: 20rem;
+  border-radius: 15px;
+}
+
+.circle {
+  margin: 15px auto;
+  border-radius: 30%;
+  width: 20px;
+  height: 20px;
+  background-color: brown;
+}
