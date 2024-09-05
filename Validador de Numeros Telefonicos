@@ -1,0 +1,197 @@
+<!-- HTML-->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Validador de Numeros Telefonicos</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Validador de Números Telefónicos de USA</h1>
+      <div class="phone-container">
+        <div class="phone-background">
+          <div class="phone-camera"></div>
+        </div>
+        <label for="user-input">Ingresa un número telefónico</label>
+        <input maxlength="20" minlength="10" type="text" id="user-input" value="" placeholder="1 555-555-5555" />
+        <div id="results-div"></div>
+        <div class="phone-footer">
+          <button class="btn-styles" id="check-btn">Validar</button>
+          <button class="btn-styles" id="clear-btn">Limpiar</button>
+        </div>
+      </div>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>
+
+<!-- JS -->
+const inputUsuario = document.getElementById('user-input');
+const validarBtn = document.getElementById('check-btn');
+const limpiarBtn = document.getElementById('clear-btn');
+const resultadosDiv = document.getElementById('results-div');
+
+const verificarNumValido = input => {
+  if (input === '') {
+    alert('Please provide a phone number');
+    return;
+  }
+  const codigoPais = '^(1\\s?)?';
+  const codigoArea = '(\\([0-9]{3}\\)|[0-9]{3})';
+  const espaciosGuiones = '[\\s\\-]?';
+  const numTelefono = '[0-9]{3}[\\s\\-]?[0-9]{4}$';
+  const telfRegex = new RegExp(
+    `${codigoPais}${codigoArea}${espaciosGuiones}${numTelefono}`
+  );
+
+  const etiquetaP= document.createElement('p');
+etiquetaP.className = 'results-text';
+  telfRegex.test(input)
+    ? (etiquetaP.style.color = '#2E865F')
+    : (etiquetaP.style.color = '#8B0A1A');
+  etiquetaP.appendChild(
+    document.createTextNode(
+      `${telfRegex.test(input) ? 'Valid' : 'Invalid'} US number: ${input}`
+    )
+  );
+  resultadosDiv.appendChild(etiquetaP);
+};
+
+validarBtn.addEventListener('click', () => {
+  verificarNumValido(inputUsuario.value);
+  inputUsuario.value = '';
+});
+
+inputUsuario.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    verificarNumValido(inputUsuario.value);
+    inputUsuario.value = '';
+  }
+});
+
+limpiarBtn.addEventListener('click', () => {
+  resultadosDiv.textContent = '';
+});
+
+
+<!--CSS-->
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --phone-colors: #CC6600;
+}
+
+body {
+  background-image: url('https://th.bing.com/th/id/R.2ab152718a1a5c84040a064313a470e4?rik=Az9ktMgqFMB%2fFA&riu=http%3a%2f%2fwww.argomedo.cl%2fwp-content%2fuploads%2f2022%2f05%2fnumero-telefonico.jpg&ehk=AgloUyIj4gtsGnxKbf5bGhWw5EuvclgUH27UetaTAJ8%3d&risl=&pid=ImgRaw&r=0');
+  background-size: cover;
+  background-position: center;
+  font-family: 'Open Sans', sans-serif, 'Lato';
+  color: #0a0a23;
+}
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10vh 10vw;
+}
+
+h1 {
+  color: white;
+  font-weight: bold;
+  width: 100%;
+  max-width: 500px;
+  margin: 5vh 1vw;
+  text-align: center;
+}
+
+.phone-container {
+  position: relative;
+  background-color: var(--phone-colors);
+  width: 100%;
+  max-width: 250px;
+  height: 80vh;
+  margin: 1vh auto;
+  border-radius: 20px;
+  border: 15px solid #660066;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.phone-background {
+  background-color: #660066;
+  width: 100%;
+  height: 5vh;
+}
+
+.phone-camera {
+  background-color: var(--phone-colors);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: auto;
+  border: 1px solid black;
+}
+
+label {
+  margin: 3vh auto 1vh;
+  text-align: center;
+}
+
+#user-input {
+  display: block;
+  margin: 3vh auto;
+  padding: 1rem;
+  border: 1px solid blue;
+  border-radius: 10px;
+  text-align: center;
+  width: 90%;
+  height: 9vh;
+  font-size: 1.3rem;
+}
+
+.phone-footer {
+  background-color: #FFFF00;
+  width: 100%;
+  height: 10vh;
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid black;
+}
+
+.btn-styles {
+  cursor: pointer;
+  width: 50%;
+  margin: 0.5rem;
+  color: black;
+  font-size: 1.2rem;
+  background-image: linear-gradient(to right, #FFA07A, #FFC107, #FF9900);
+  border-color: orange;
+  border-width: 3px;
+}
+
+#results-div {
+  overflow-y: auto;
+  height: 265px;
+  width: 100%;
+}
+
+.results-text {
+  font-size: 1.2rem;
+  padding: 5px;
+  text-align: var(--center-text);
+  margin: 10px 0;
+}
