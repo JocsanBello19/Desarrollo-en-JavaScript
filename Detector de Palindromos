@@ -1,0 +1,190 @@
+<!--HTML-->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detector de Palíndromos</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="contenedor">
+      <h1 class="titulo">¿Esta palabra es un palíndromo?</h1>
+      <div class="palindromo-div">
+        <label for="text-input"
+          >Escribe una palabra en este campo para verificar si es un palíndromo
+        </label>
+        <input class="palindromo-input" id="text-input" value="" type="text" placeholder="Posible palindromo" name="palindromo" minlength="3" />
+        <button class="palindromo-btn" id="check-btn">Verificar</button>
+        <div class="resultados-div texto-oculto"  id="result"></div>
+      </div>
+      <div class="palindromo-descripcion-div">
+        <p class="palindromo-descripcion">
+          Un palíndromo es una palabra, frase o secuencia de caracteres que se lee igual en ambos sentidos, es decir, que se puede leer de izquierda a derecha y de derecha a izquierda, sin cambiar su forma o estructura.
+        </p>
+      </div>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>
+
+
+<!-- JS -->
+const usuarioInput = document.getElementById('text-input');
+const verificarPalindromoBtn = document.getElementById('check-btn');
+const resultadoDiv = document.getElementById('result');
+
+const verificarPalindromo = input => {
+  const inputOriginal = input;
+
+  if (input === '') {
+    alert("Please input a value");
+    return;
+  }
+
+  resultadoDiv.replaceChildren();
+
+  const lowerCaseStr = input.replace(/[^A-Za-z0-9]/gi, '').toLowerCase();
+  let resultadoMsj = `<strong>${inputOriginal}</strong> ${
+    lowerCaseStr === [...lowerCaseStr].reverse().join('') ? 'is' : 'is not'
+  } a palindrome.`
+
+  const etiquetaP = document.createElement('p');
+  etiquetaP.className = 'usuario-input';
+  etiquetaP.innerHTML = resultadoMsj;
+  resultadoDiv.appendChild(etiquetaP);
+
+  resultadoDiv.classList.remove('texto-oculto');
+};
+
+verificarPalindromoBtn.addEventListener('click', () => {
+  verificarPalindromo(usuarioInput.value);
+  usuarioInput.value = '';
+});
+
+usuarioInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    verificarPalindromo(usuarioInput.value);
+    usuarioInput.value = '';
+  }
+});
+
+
+<!-- CSS -->
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Times New Roman, Georgia, Garamond;
+  font-size: 1.5em;
+  background-color: #C7E8F3;
+  color: #333399;
+}
+
+.contenedor {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.titulo {
+  text-align: center;
+  padding: 10px 0;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.palindromo-div {
+  width: min(100vw, 450px);
+  min-height: 100px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 2vh 3vw;
+  margin: 3vh 3vw;
+  background-color: yellow;
+  box-shadow: 0 8px 8px orange;
+  font-style: italic;
+}
+
+label {
+  color: #0a0a23;
+  margin-bottom: 20px;
+}
+
+.palindromo-btn {
+  width: 15vw;
+  min-width: 80px;
+  border: none;
+  margin-left: 1em;
+  padding: 1em;
+  border-radius: 20px;
+  background-color: #333399;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.palindromo-input {
+  height: 6vh;
+  width: 35vw;
+  text-align: center;
+  font-size: 1.2rem;
+  margin: 10px;
+  border: none;
+  border-bottom: 2px solid red;
+}
+
+input[type="text"] {
+  min-width: 220px;
+}
+
+.palindromo-input::placeholder {
+  text-align: center;
+}
+
+.usuario-input {
+  font-size: 1.5rem;
+  margin: 5vh 5vh;
+  text-align: center;
+}
+
+.resultados-div {
+  overflow-y: auto;
+  word-wrap: break-word;
+  min-height: 50px;
+  color: black;
+}
+
+.palindromo-descripcion-div {
+  width: min(100vw, 450px);
+  font-size: 1.4rem;
+  min-height: 130px;
+  background-color: #F2C464;
+  margin-top: 5vh;
+  padding: 0.7rem;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+}
+
+.texto-oculto {
+  display: none;
+}
+
+.palindromo-descripcion {
+  vertical-align: middle;
+  text-align: center;
+}
